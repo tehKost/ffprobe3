@@ -39,7 +39,8 @@ class FFProbe:
             self.video = []
             self.audio = []
             data_lines = []
-            for a in iter(p.stdout.readline, b''):
+            stdout, stderr = p.communicate()
+            for a in stdout.split(os.linesep.encode()):
                 a = a.decode('UTF-8')
                 if re.match(r'\[STREAM\]', a):
                     data_lines = []
@@ -48,7 +49,7 @@ class FFProbe:
                     data_lines = []
                 else:
                     data_lines.append(a)
-            for a in iter(p.stderr.readline, b''):
+            for a in stderr.split(os.linesep.encode()):
                 a = a.decode('UTF-8')
                 if re.match(r'\[STREAM\]', a):
                     data_lines = []
@@ -57,8 +58,6 @@ class FFProbe:
                     data_lines = []
                 else:
                     data_lines.append(a)
-            p.stdout.close()
-            p.stderr.close()
             for a in self.streams:
                 if a.is_audio():
                     self.audio.append(a)
